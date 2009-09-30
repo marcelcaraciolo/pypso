@@ -50,6 +50,38 @@ elif sys_platform[:5] == "linux":
     Util.set_curses_term()
 
 
+def FitnessScoreCriteria(pso_engine):
+	""" Terminate the evolution using the bestFitness parameter obtained from the particle
+
+	Example:
+		>>> particleRep.setParams(bestFitness=0.00, roundDecimal=2)
+		(...)
+		>>> pso_engine.terminationCriteria.set(Pso.FitnessScoreCriteria)
+
+	"""
+	particle = pso_engine.bestParticle()
+	bestFitness = particle.getParam("bestFitness")
+	roundDecimal = particle.getParam("roundDecimal")
+	
+	if bestFitness is None:
+		Util.raiseException("You must specify the bestFitness parameter", ValueError)
+	
+	if pso_engine.getMinimax() == Consts.minimaxType["maximize"]:
+		if roundDecimal is not None:
+			return round(bestFitness,roundDecimal) <= round(particle.ownBestFitness,roundDecimal)
+		else:
+			return bestFitness < particle.ownBestFitness
+	
+	else:
+		if roundDecimal is not None:
+			return round(bestFitness,roundDecimal) >= round(particle.ownBestFitness, roundDecimal)
+		else:
+			return bestFitness >= particle.ownBestFitness
+	
+	return flag
+
+
+
 
 class SimplePSO(object):
 	""" SimplePSO Engine Class - The PSO Algorithm Core
